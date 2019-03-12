@@ -1,0 +1,26 @@
+{
+  "name": "@drykenspel/pixi-proto",
+  "version": "0.1.0",
+  "description": "Pixi.js prototype of the game",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drykenspel/pixi-proto.git"
+  },
+  "author": "Drykenspel <drykenspel.game@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/Drykenspel/pixi-proto/issues"
+  },
+  "homepage": "https://github.com/Drykenspel/pixi-proto#readme",
+  "devDependencies": {
+    "webpack": "^4.29.6",
+    "webpack-dev-server": "^3.2.1"
+  },
+  "dependencies": {
+    "pixi.js": "^5.0.0-rc.2",
+    "webpack-cli": "^3.2.3"
+  }
+}
