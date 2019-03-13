@@ -3,10 +3,22 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
+  devtool: 'inline-source-map',
   entry: {
     app: './src/index.js',
   },
-  plugins: [],
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: "awesome-typescript-loader",
+        exclude: /node_modules/,
+      }
+    ]
+  },
+  resolve: {
+    extensions: [ ".tsx", ".ts", ".js" ],
+  },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,

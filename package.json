@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Pixi.js prototype of the game",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nyc mocha",
     "start": "webpack-dev-server --open"
   },
   "repository": {
@@ -16,10 +16,18 @@
   },
   "homepage": "https://github.com/Drykenspel/pixi-proto#readme",
   "devDependencies": {
+    "@types/node": "^11.11.3",
+    "@types/pixi.js": "^4.8.6",
+    "awesome-typescript-loader": "^5.2.1",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0",
+    "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
     "webpack-dev-server": "^3.2.1"
   },
   "dependencies": {
+    "debounce": "^1.2.0",
     "pixi.js": "^5.0.0-rc.2",
     "webpack-cli": "^3.2.3"
   }
