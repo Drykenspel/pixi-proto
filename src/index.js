@@ -1,22 +1,31 @@
 import * as PIXI from "pixi.js";
-//import Player from "./player.js";
+import { debounce } from "debounce";
+import Player from "./actor/player";
 //import SpiderSpawner from "./spiderSpawner.js";
 
+export const GAME_FPS = 60;
+
 function createApp() {
-  let app = new PIXI.Application({ width: 400, height: 400 });
+  let app = new PIXI.Application({
+    /*width: 400,
+    height: 400,*/
+    resizeTo: window,
+  });
   document.body.appendChild(app.view);
+  // Add resize handler (fires at most every 200ms) TODO: Re-centre player
+  window.addEventListener("resize", debounce(() => app.resize(), 200));
 
   app.renderer.backgroundColor = 0xcecece;
-  app.renderer.view.style.position = "absolute";
-  app.renderer.view.style.display = "block";
-  app.renderer.autoresize = true;
-  app.renderer.resize(window.innerWidth, window.innerHeight);
+  //app.renderer.view.style.position = "absolute";
+  //app.renderer.view.style.display = "block";
+  app.renderer.autoDensity = true;
+  //app.renderer.resize(window.innerWidth, window.innerHeight);
   return app;
 }
 
-const app = createApp();
+const APP = createApp();
 
-PIXI.loader.add("Bug.png", "assets/Bug.png")
+PIXI.Loader.shared.add("Bug.png", "assets/Bug.png")
   .on("progress", (loader, resource) => {
     console.debug(`Loading: ${loader.progress}%. Loaded ${resource.url}`);
   })
@@ -24,11 +33,23 @@ PIXI.loader.add("Bug.png", "assets/Bug.png")
 
 
 function setupGame() {
-  /*let player = new Player();
+  let player = new Player(APP);
   //Update velocity accepts no args, so att instance will be ignored
-  player.moveSpeed.onChange(updateVelocity);
+  player.moveSpeed.onChange((att) => {
+    //let speed = att.value;
+    let h = 0;
+    let v = 0;
+    //TODO: add controls
+    /* eslint-disable curly *//*
+    if(actionWest.active)   h -= 1;
+    if(actionEast.active)   h += 1;
+    if(actionNorth.active)  v -= 1;
+    if(actionSouth.active)  v += 1;
+    /* eslint-enable */
+    player.setVelocity({ x: h, y: v });
+  });
 
-  let spawner = new SpiderSpawner();
+  /*let spawner = new SpiderSpawner();
   spawner.pos = {x: 100, y: 100};
   app.stage.addChild(spawner.sprite);
 
