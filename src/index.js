@@ -1,36 +1,28 @@
 import * as PIXI from "pixi.js";
-import { debounce } from "debounce";
-import Player from "./actor/player";
+import Client from "./client";
+//import Player from "./actor/player";
 //import SpiderSpawner from "./spiderSpawner.js";
 
 export const GAME_FPS = 60;
 
-const APP = new PIXI.Application({
-  /*width: 400,
-  height: 400,*/
-  resizeTo: window,
-  backgroundColor: 0xcecece,
-  autoDensity: true,
-});
+const CLIENT = new Client(document.body);
 
-document.body.appendChild(APP.view);
-
-PIXI.Loader.shared.add("Bug.png", "assets/Bug.png")
+CLIENT.loader.add("Bug.png", "assets/Bug.png")
   .on("progress", (loader, resource) => {
     console.debug(`Loading: ${loader.progress}%. Loaded ${resource.url}`);
   })
   .load(setupGame);
 
 function setupGame() {
-  let player = new Player(APP);
-  // Add resize handler (fires at most every 200ms)
-  window.addEventListener("resize", debounce(() => {
-    APP.resize();
-    player.setPosition(player.pos);
-  }, 200));
+  let map = new PIXI.Graphics();
+  map.beginFill(0x6330ff);
+  map.drawRect(-305, -305, 300, 300);
+  map.endFill();
+  map.position.set(CLIENT.view.width, CLIENT.view.height);
+  CLIENT.gui.addChild(map);
 
   //Update velocity accepts no args, so att instance will be ignored
-  player.moveSpeed.onChange((att) => {
+  CLIENT.player.moveSpeed.onChange((att) => {
     //let speed = att.value;
     let h = 0;
     let v = 0;
@@ -41,7 +33,7 @@ function setupGame() {
     if(actionNorth.active)  v -= 1;
     if(actionSouth.active)  v += 1;
     /* eslint-enable */
-    player.setVelocity({ x: h, y: v });
+    CLIENT.player.setVelocity({ x: h, y: v });
   });
 
   /*let spawner = new SpiderSpawner();
