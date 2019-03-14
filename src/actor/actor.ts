@@ -18,14 +18,17 @@ export default class Actor {
   /** Limited to between 0 and 1 full revolution per frame (inclusive) */
   readonly rotationSpeed: Attribute;
 
-  private readonly displayObj: PIXI.DisplayObject;
-  private readonly pos: Vec = { x: 0, y: 0 };
-  private readonly vel: Vec = { x: 0, y: 0 };
+  protected parent: PIXI.Container;
+
+  protected readonly displayObj: PIXI.DisplayObject;
+  protected readonly pos: Vec = { x: 0, y: 0 };
+  protected readonly vel: Vec = { x: 0, y: 0 };
   private readonly forces: Array<Vec> = [];
   private rot: number = 0;
 
   constructor(parent: PIXI.Container, display: PIXI.DisplayObject, options: Partial<Options>) {
     this.displayObj = display;
+    this.parent = parent;
     /** Limited to more than or equal to 0 */
     this.moveSpeed = new Attribute(options.hasOwnProperty("ms") ? options.ms! : 5, 0);
     this.moveSpeed.onChange(() => this.setVelocity(this.vel));
@@ -44,6 +47,10 @@ export default class Actor {
     if (pos.rotation != undefined) {
       this.displayObj.rotation = this.rot = pos.rotation;
     }
+  }
+
+  public getPosition(): Vec {
+    return Object.freeze(Object.assign({}, this.pos));
   }
 
   public rotateToPoint(point: Vec) {

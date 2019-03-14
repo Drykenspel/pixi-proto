@@ -28,5 +28,15 @@ export default class Player extends Actor {
         rotation: Math.PI,
       },
     }));
+    this.app = app;
+  }
+  setPosition(pos) {
+    super.setPosition(pos);
+    if (this.app) { // If not initial position
+      this.parent.position.set(
+        this.app.view.width / 2 - this.pos.x,
+        this.app.view.height / 2 - this.pos.y
+      );
+    }
   }
 }

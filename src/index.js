@@ -5,25 +5,15 @@ import Player from "./actor/player";
 
 export const GAME_FPS = 60;
 
-function createApp() {
-  let app = new PIXI.Application({
-    /*width: 400,
-    height: 400,*/
-    resizeTo: window,
-  });
-  document.body.appendChild(app.view);
-  // Add resize handler (fires at most every 200ms) TODO: Re-centre player
-  window.addEventListener("resize", debounce(() => app.resize(), 200));
+const APP = new PIXI.Application({
+  /*width: 400,
+  height: 400,*/
+  resizeTo: window,
+  backgroundColor: 0xcecece,
+  autoDensity: true,
+});
 
-  app.renderer.backgroundColor = 0xcecece;
-  //app.renderer.view.style.position = "absolute";
-  //app.renderer.view.style.display = "block";
-  app.renderer.autoDensity = true;
-  //app.renderer.resize(window.innerWidth, window.innerHeight);
-  return app;
-}
-
-const APP = createApp();
+document.body.appendChild(APP.view);
 
 PIXI.Loader.shared.add("Bug.png", "assets/Bug.png")
   .on("progress", (loader, resource) => {
@@ -31,9 +21,14 @@ PIXI.Loader.shared.add("Bug.png", "assets/Bug.png")
   })
   .load(setupGame);
 
-
 function setupGame() {
   let player = new Player(APP);
+  // Add resize handler (fires at most every 200ms)
+  window.addEventListener("resize", debounce(() => {
+    APP.resize();
+    player.setPosition(player.pos);
+  }, 200));
+
   //Update velocity accepts no args, so att instance will be ignored
   player.moveSpeed.onChange((att) => {
     //let speed = att.value;
