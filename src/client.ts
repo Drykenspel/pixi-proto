@@ -18,7 +18,7 @@ export default class Client extends PIXI.Application {
     this.stage.addChild(this.world = new PIXI.Container());
     this.stage.addChild(this.gui = new PIXI.Container());
 
-    this.loader.on('complete', (loader, resources) => {
+    this.loader.on("complete", (loader, resources) => {
       this.localPlayer = new Player(this);
     });
   }

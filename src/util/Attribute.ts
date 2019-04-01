@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 export const enum ModifyType {
   BASE_ADD,
   BASE_MULTIPLY,
   STACKING_MULTIPLY,
 }
+/* eslint-enable no-unused-vars */
 
 interface Modifier<T extends ModifyType> {
   amount: number;
@@ -13,7 +15,7 @@ type ChangeListener = (attributeInstance: Attribute, oldValue: number) => void;
 
 export default class Attribute {
   private baseValue: number;
-  private readonly modifiers: { [mType in ModifyType]: Array<Modifier<mType>> };
+  private readonly modifiers: { [mType in ModifyType]: Modifier<mType>[] };
   private readonly listeners: ChangeListener[];
   private cachedValue: number;
   private dirty: boolean;
@@ -72,12 +74,12 @@ export default class Attribute {
       let val = this.baseValue;
       let basemult = 1;
       let mult = 1;
-      this.modifiers[ModifyType.BASE_ADD].forEach((m) => (val += m.amount));
+      this.modifiers[ModifyType.BASE_ADD].forEach(m => (val += m.amount));
       this.modifiers[ModifyType.BASE_MULTIPLY].forEach(
-        (m) => (basemult += m.amount)
+        m => (basemult += m.amount)
       );
       this.modifiers[ModifyType.STACKING_MULTIPLY].forEach(
-        (m) => (mult *= m.amount)
+        m => (mult *= m.amount)
       );
       this.cachedValue = val * basemult * mult;
       this.dirty = false;
@@ -85,29 +87,13 @@ export default class Attribute {
     return this.cachedValue;
   }
 
-  /*
-   * @param {Object} modifier An object containing a "key" property and one or more of the following keys with numerical values:
-   * @param {number} [modifier.baseAdd] Number to add to the base value before further calculations.
-   * @param {number} [modifier.baseMult] Number to multiply the modified base value by. Does not stack, so 2 `2x` multipliers will be a `3x` multiplier in total.
-   * @param {number} [modifier.stackingMult] Number to multiple the final value by. Stacks, so 2 `2x` multipliers will be a `4x` multiplier in total
-   * @param {number} [baseAdd] If `modifier` was just the key, this will be the value used for the modifier baseAdd property
-   * @param {number} [baseMult] If `modifier` was just the key, this will be the value used for the modifier baseMult property
-   * @param {number} [stackingMult] If `modifier` was just the key, this will be the value used for the modifier stackingMult property
-   *
-   * @example  //Will increase the value by 3
-   * attribute.addModifier({key: "exampleModifierKey", baseAdd: 3});
-   * //Will multiply the (modified) base value by 2 (does not stack, so 2 *2 multipliers will be a x3 multiplier in total)
-   * attribute.addModifier({key: "exampleModifierKey2", baseMult: 2});
-   * //Will multiply the final value by 4 (stacks, so 2 *2 multipliers will be a *4 multiplier in total)
-   * attribute.addModifier({key: "exampleModifierKey3", stackingMult: 4});
-   */
   public addModifier<T extends ModifyType>(modifier: Modifier<T>): void {
-    (this.modifiers[modifier.modType] as Array<Modifier<T>>).push(modifier);
+    (this.modifiers[modifier.modType] as Modifier<T>[]).push(modifier);
     this.markDirty();
   }
 
   public removeModifier<T extends ModifyType>(modifier: Modifier<T>): boolean {
-    const list = this.modifiers[modifier.modType] as Array<Modifier<T>>;
+    const list = this.modifiers[modifier.modType] as Modifier<T>[];
     const index = list.indexOf(modifier);
     const flag = index > -1;
     if (flag) {
@@ -119,6 +105,6 @@ export default class Attribute {
 
   private markDirty(): void {
     this.dirty = true;
-    this.listeners.forEach((l) => l(this, this.cachedValue));
+    this.listeners.forEach(l => l(this, this.cachedValue));
   }
 }

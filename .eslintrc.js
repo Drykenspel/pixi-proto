@@ -7,10 +7,12 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 6,
     sourceType: "module",
+    project: "./tsconfig.json",
   },
-  /*globals: {
-    PIXI: false,
-  },*/
+  parser: "@typescript-eslint/parser",
+  plugins: [
+    "@typescript-eslint"
+  ],
   rules: {
     "indent": ["error", 2, { SwitchCase: 1 }],
     "linebreak-style": ["error", "unix"],
@@ -28,5 +30,13 @@ module.exports = {
     "no-trailing-spaces": ["error"],
     "object-curly-spacing": ["warn", "always", { objectsInObjects: false, arraysInObjects: false }],
     "arrow-parens": ["warn", "as-needed", { "requireForBlockBody": true }],
+    "@typescript-eslint/array-type": ["error"],
+    "@typescript-eslint/class-name-casing": "error",
+    "@typescript-eslint/prefer-function-type": "error",
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      multiline: { delimiter: "semi", requireLast: true },
+      singleline: { delimiter: "semi", requireLast: false }
+    }],
   },
 };
