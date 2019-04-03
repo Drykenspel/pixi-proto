@@ -13,7 +13,7 @@ export default class Client extends PIXI.Application {
     }, pixiOpts, { backgroundColor: 0xcecece }));
     domParent.appendChild(this.view);
     // Add resize handler (fires at most every 200ms)
-    window.addEventListener("resize", debounce(() => this.resize(), 200));
+    window.addEventListener("resize", debounce(() => Client.prototype.resize.call(this), 200));
 
     this.stage.addChild(this.world = new PIXI.Container());
     this.stage.addChild(this.gui = new PIXI.Container());
@@ -23,7 +23,7 @@ export default class Client extends PIXI.Application {
     });
   }
   resize(): void {
-    super.resize();
+    this.resize();
     if (this.player) {
       this.player.setPosition(this.player.getPosition());
     }
