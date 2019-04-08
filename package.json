@@ -4,7 +4,7 @@
   "description": "Pixi.js prototype of the game",
   "scripts": {
     "test": "nyc mocha",
-    "start": "webpack-dev-server --open"
+    "start": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   "homepage": "https://github.com/Drykenspel/pixi-proto#readme",
   "devDependencies": {
     "@types/debounce": "^1.2.0",
-    "@types/node": "^11.11.3",
+    "@types/node": "^11.13.0",
     "@types/pixi.js": "^4.8.6",
     "@typescript-eslint/eslint-plugin": "^1.5.0",
     "@typescript-eslint/parser": "^1.5.0",
@@ -26,13 +26,13 @@
     "eslint": "^5.16.0",
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
-    "typescript": "^3.3.3333",
+    "typescript": "^3.4.1",
     "webpack": "^4.29.6",
     "webpack-dev-server": "^3.2.1"
   },
   "dependencies": {
+    "pixi.js": "^5.0.0-rc.3",
     "debounce": "^1.2.0",
-    "pixi.js": "^5.0.0-rc.2",
-    "webpack-cli": "^3.2.3"
+    "webpack-cli": "^3.3.0"
   }
 }

@@ -1,5 +1,5 @@
-import * as PIXI from "pixi.js";
-import Client from "./client";
+//import * as PIXI from "pixi.js";
+import Client from "./client/Application";
 //import Player from "./actor/player";
 //import SpiderSpawner from "./spiderSpawner.js";
 
