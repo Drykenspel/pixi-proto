@@ -64,9 +64,11 @@ export default class Actor {
   }
 
   public setVelocity(point: Vec, overrideMS = false) {
-    let modifier = overrideMS
-      ? 1
-      : this.moveSpeed.value / Math.sqrt(point.x * point.x + point.y * point.y);
+    let modifier = 1;
+    if (!overrideMS) {
+      let mag = Math.sqrt(point.x * point.x + point.y * point.y);
+      modifier = mag === 0 ? 0 : this.moveSpeed.value / mag;
+    }
     this.vel.x = point.x * modifier;
     this.vel.y = point.y * modifier;
   }

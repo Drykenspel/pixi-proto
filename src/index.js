@@ -1,11 +1,14 @@
-//import * as PIXI from "pixi.js";
+import * as PIXI from "pixi.js";
 import Client from "./client/Application";
-//import Player from "./actor/player";
+import { Actor, createPlayerSprite } from "./actor";
 //import SpiderSpawner from "./spiderSpawner.js";
 
 export const GAME_FPS = 60;
 
-const CLIENT = new Client(document.body);
+const CLIENT = new Client({
+  resizeTo: window,
+});
+document.body.appendChild(CLIENT.view);
 
 CLIENT.loader.add("Bug.png", "assets/Bug.png")
   .on("progress", (loader, resource) => {
@@ -19,10 +22,40 @@ function setupGame() {
   map.drawRect(-305, -305, 300, 300);
   map.endFill();
   map.position.set(CLIENT.view.width, CLIENT.view.height);
-  CLIENT.gui.addChild(map);
+  CLIENT.interface.addChild(map);
 
+  let player = new Actor(CLIENT.world, createPlayerSprite(), {
+    pos: {
+      x: CLIENT.view.width / 2,
+      y: CLIENT.view.height / 2,
+      rotation: Math.PI,
+    },
+  });
+  player.displayObj.interactive = true;
+  player.displayObj.on("pointerdown", () => {
+    CLIENT.centerOn(player.displayObj);
+    player.setVelocity({ x: -1, y: -2 });
+  });
+  player.displayObj.on("pointerup", () => player.setVelocity({ x: 0, y: 0 }));
+  CLIENT.centerOn(player.displayObj);
+
+  // Add obj to show scene moving around
+  let obj = new PIXI.Graphics();
+  obj.beginFill(0x6330ff);
+  obj.drawRect(20, 20, 30, 30);
+  obj.endFill();
+  obj.position.set(0, 0);
+  CLIENT.world.addChild(obj);
+  obj.interactive = true;
+  obj.on("pointerdown", () => {
+    CLIENT.centerOn(obj);
+    player.setVelocity({ x: 4, y: 8 });
+  });
+  obj.on("pointerup", () => player.setVelocity({ x: 0, y: 0 }));
+
+  CLIENT.app.ticker.add(delta => player.update(delta));
   //Update velocity accepts no args, so att instance will be ignored
-  CLIENT.player.moveSpeed.onChange((att) => {
+  /*CLIENT.player.moveSpeed.onChange((att) => {
     //let speed = att.value;
     let h = 0;
     let v = 0;
@@ -32,9 +65,9 @@ function setupGame() {
     if(actionEast.active)   h += 1;
     if(actionNorth.active)  v -= 1;
     if(actionSouth.active)  v += 1;
-    /* eslint-enable */
+    /* eslint-enable *//*
     CLIENT.player.setVelocity({ x: h, y: v });
-  });
+  });*/
 
   /*let spawner = new SpiderSpawner();
   spawner.pos = {x: 100, y: 100};

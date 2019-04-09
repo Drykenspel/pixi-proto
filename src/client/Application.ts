@@ -1,5 +1,25 @@
 import * as PIXI from "pixi.js";
-import { ObservableTransform } from "../util";
+
+declare module "pixi.js" {
+  export interface DisplayObject {
+    readonly transformChangeRunner: PIXI.Runner;
+  }
+}
+
+PIXI.DisplayObject.mixin(Object.defineProperty({}, "transformChangeRunner", {
+  get() {
+    if (!this._onTransformChangeRunner) {
+      this._onTransformChangeRunner = new PIXI.Runner("onTransformChange");
+      this.transform.position = this.transform.position.clone(() => {
+        this.transform.onChange();
+        this._onTransformChangeRunner.emit(this.transform, this);
+      }, this);
+    }
+    return this._onTransformChangeRunner;
+  },
+  enumerable: true,
+}));
+
 
 /**
  * Wraps an instance of `PIXI.Application`.
@@ -9,30 +29,47 @@ import { ObservableTransform } from "../util";
 export default class Application {
   readonly interface: PIXI.Container;
   readonly world: PIXI.Container;
-  cameraTarget?: {transform: ObservableTransform};
+  cameraTarget?: PIXI.DisplayObject;
   protected app: PIXI.Application;
 
   constructor(options: PIXI.ApplicationOptions) {
     this.app = new PIXI.Application(options);
     this.world = new PIXI.Container();
     this.interface = new PIXI.Container();
+    this.interface.zIndex = 50;
+    this.app.stage.addChild(this.world, this.interface);
+    //@ts-ignore
+    this.app.renderer.runners.resize.add(this);
   }
 
-  centerCamera() {
-    if (this.cameraTarget) {
-      this.world.position.set(
-        this.app.view.width / 2 -this.cameraTarget.transform.position.x,
-        this.app.view.height / 2 -this.cameraTarget.transform.position.y,
-      );
+  centerCamera(transform?: PIXI.Transform): void {
+    if (!transform && this.cameraTarget) {
+      transform = this.cameraTarget.transform;
     }
+    this.world.position.set(
+      this.app.view.width / 2 - transform!.position.x,
+      this.app.view.height / 2 - transform!.position.y,
+    );
   }
 
-  centerOn(observableDO: {transform: ObservableTransform}) {
+  centerOn(displayObj: PIXI.DisplayObject): void {
     if (this.cameraTarget) {
-      this.cameraTarget.transform.listener = null;
+      this.cameraTarget.transformChangeRunner.remove(this);
     }
-    this.cameraTarget = observableDO;
-    this.cameraTarget.transform.listener = () => { this.centerCamera; };
+    this.cameraTarget = displayObj;
+    displayObj.transformChangeRunner.add(this);
+    this.centerCamera();
+  }
+
+  private onTransformChange(transform: PIXI.Transform, displayObj: PIXI.DisplayObject) {
+    this.centerCamera(transform);
+  }
+  private resize() {
+    this.centerCamera();
+  }
+
+  get loader() {
+    return this.app.loader;
   }
 
   /**
@@ -43,50 +80,49 @@ export default class Application {
   }
 
   /**
-* Reference to the renderer's canvas element.
-* @member {HTMLCanvasElement}
-* @readonly
-*/
+  * Reference to the renderer's canvas element.
+  * @member {HTMLCanvasElement}
+  * @readonly
+  */
   get view(): HTMLCanvasElement {
-    return this.renderer.view;
+    return this.app.view;
   }
 
   /**
-* Reference to the renderer's screen rectangle. Its safe to use as `filterArea` or `hitArea` for the whole screen.
-* @member {PIXI.Rectangle}
-* @readonly
-*/
+  * Reference to the renderer's screen rectangle. Its safe to use as `filterArea` or `hitArea` for the whole screen.
+  * @member {PIXI.Rectangle}
+  * @readonly
+  */
   get screen() {
-    return this.renderer.screen;
+    return this.app.screen;
   }
 
   /**
-* Destroy and don't use after this.
-* @param {Boolean} [removeView=false] Automatically remove canvas from DOM.
-* @param {object|boolean} [stageOptions] - Options parameter. A boolean will act as if all options
-*  have been set to that value
-* @param {boolean} [stageOptions.children=false] - if set to true, all the children will have their destroy
-*  method called as well. 'stageOptions' will be passed on to those calls.
-* @param {boolean} [stageOptions.texture=false] - Only used for child Sprites if stageOptions.children is set
-*  to true. Should it destroy the texture of the child sprite
-* @param {boolean} [stageOptions.baseTexture=false] - Only used for child Sprites if stageOptions.children is set
-*  to true. Should it destroy the base texture of the child sprite
-*/
-  destroy(removeView?: boolean) {
-    // Destroy plugins in the opposite order
-    // which they were constructed
-    //@ts-ignore
-    const plugins: PIXI.Application.Plugin[] = Application._plugins.slice(0);
-
-    plugins.reverse();
-    plugins.forEach((plugin) => {
-      plugin.destroy.call(this);
-    });
-
+  * Destroy and don't use after this.
+  * @param {Boolean} [removeView=false] Automatically remove canvas from DOM.
+  * @param {object|boolean} [stageOptions] - Options parameter. A boolean will act as if all options
+  *  have been set to that value
+  * @param {boolean} [stageOptions.children=false] - if set to true, all the children will have their destroy
+  *  method called as well. 'stageOptions' will be passed on to those calls.
+  * @param {boolean} [stageOptions.texture=false] - Only used for child Sprites if stageOptions.children is set
+  *  to true. Should it destroy the texture of the child sprite
+  * @param {boolean} [stageOptions.baseTexture=false] - Only used for child Sprites if stageOptions.children is set
+  *  to true. Should it destroy the base texture of the child sprite
+  */
+  destroy() {
+    if (this.cameraTarget) {
+      this.cameraTarget.transformChangeRunner.remove(this);
+      //@ts-ignore
+      this.cameraTarget = null;
+    }
     this.world.destroy();
-
-    this.renderer.destroy(removeView);
-    this.renderer = null;
+    //@ts-ignore
+    this.world = null;
+    this.interface.destroy();
+    //@ts-ignore
+    this.interface = null;
+    this.app.destroy(...arguments);
+    //@ts-ignore
+    this.app = null;
   }
 }
-new Application({ view: { game: document.createElement("canvas") }});

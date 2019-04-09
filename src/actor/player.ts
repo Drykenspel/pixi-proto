@@ -1,7 +1,7 @@
 import Actor from "./actor";
 import * as PIXI from "pixi.js";
 
-function createPlayerSprite() {
+export function createPlayerSprite() {
   let playerSprite = new PIXI.Graphics();
   playerSprite.beginFill(0x6330ff);
   playerSprite.drawEllipse(0, 0, 40, 15);
@@ -19,7 +19,7 @@ function createPlayerSprite() {
   return playerSprite;
 }
 
-export default class Player extends Actor {
+export default class Player extends Actor {}/*
   constructor(app, options) {
     super(app.stage, createPlayerSprite(), Object.assign({}, options, {
       pos: {
@@ -39,4 +39,4 @@ export default class Player extends Actor {
       );
     }
   }
-}
+}*/
