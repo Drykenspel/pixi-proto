@@ -1,7 +1,7 @@
 export enum InputType { ANALOG, DIGITAL };
 
 
-interface IInputBinding {
+export interface IInputBinding {
   value(): number;
   matchContext(context: /*TODO: InputContext */ any): boolean;
 }

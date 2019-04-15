@@ -1,3 +1,6 @@
+import { InputAction } from "./action";
+import { InputContext } from "./InputContext";
+
 interface InputManagerOptions {
   /**
    * The element to add the event listeners to.
@@ -7,6 +10,7 @@ interface InputManagerOptions {
   useKeyName: boolean;
 }
 
+// Defaults and assigned options
 const options: InputManagerOptions = {
   element: window,
   useKeyName: false,
@@ -22,8 +26,22 @@ export function init(opts: Partial<InputManagerOptions>): void {
   options.element.addEventListener("wheel", handleWheel);
 }
 
-export function activateContext(contextKey: string) {
+let currentContext: InputContext = InputContext.DEFAULT;
 
+export function createContext(contextKey: string): InputContext {
+  return new InputContext(contextKey);
+}
+
+export function getContext(contextKey: string): InputContext | undefined {
+  return InputContext.get(contextKey);
+}
+
+export function activateContext(contextKey?: string) {
+  if (!contextKey) {
+    contextKey = InputContext.DEFAULT.key;
+  }
+  currentContext = InputContext.getOrDefault(contextKey);
+  //TODO: Build input map
 }
 
 const keyState = new Map<string, boolean>();
@@ -55,5 +73,5 @@ function handleWheel(event: WheelEvent) {
 }
 
 function updateKeyInput() {
-  //TODO
+  //TODO:??currentContext.
 }
