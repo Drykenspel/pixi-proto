@@ -20,7 +20,7 @@ module.exports = {
     "semi": ["error", "always"],
     "no-console": "off",
     "no-undef": "error",
-    "no-unused-vars": ["error", { args: "none" }],
+    "@typescript-eslint/no-unused-vars": ["error", { args: "none" }],
     "multiline-ternary": ["error", "always-multiline"],
     "brace-style": ["error", "1tbs", { allowSingleLine: true }],
     "curly": ["warn", "all"],
