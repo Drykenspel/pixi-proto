@@ -1,15 +1,15 @@
 import { InputAction } from "./action";
+import { IInput } from "./iinput";
 
-type IInputType = any;//TODO: What type should this be?
 
 interface IInputBinding {
-  readonly input: IInputType;
+  readonly input: IInput;
 }
 type InputMap = Map<string, InputModifier | InputTrigger>;
 
 abstract class InputMapContainer {
   readonly inputMap: InputMap = new Map();
-  modifier(input: IInputType): InputModifier {
+  modifier(input: IInput): InputModifier {
     if (this.inputMap.has(input)) {
       let entry = this.inputMap.get(input);
       if (entry instanceof InputModifier) {
@@ -23,7 +23,7 @@ abstract class InputMapContainer {
       return modifier;
     }
   }
-  trigger(input: IInputType, action: InputAction<any>): InputTrigger {
+  trigger(input: IInput, action: InputAction): InputTrigger {
     if (this.inputMap.has(input)) {
       throw new Error("Cannot register multiple triggers to the same key: " + input);
     } else {
@@ -35,12 +35,17 @@ abstract class InputMapContainer {
 }
 
 class InputModifier extends InputMapContainer implements IInputBinding {
-  constructor(readonly input: IInputType) {
+  constructor(input: IInput) {
     super();
+    this.input = input;
   }
 }
 class InputTrigger implements IInputBinding {
-  constructor(readonly input: IInputType, readonly action: InputAction<any>) {}
+  readonly action: InputAction
+  constructor(input: IInput, action: InputAction) {
+    this.input = input;
+    this.action = action;
+  }
 }
 
 export class InputContext extends InputMapContainer {
@@ -53,8 +58,10 @@ export class InputContext extends InputMapContainer {
     return this.get(contextKey) || this.DEFAULT;
   }
 
-  constructor(readonly key: string) {
+  readonly key: string;
+  constructor(key: string) {
     super();
+    this.key = key;
     if (InputContext.contexts.has(key)) {
       throw new Error("Attempted to register multiple InputContexts with the same key: " + key);
     }

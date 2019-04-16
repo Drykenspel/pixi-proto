@@ -1,18 +1,24 @@
-import { InputType } from "./input";
+export enum InputType { ANALOG, DIGITAL };
 
 type IDType = string;
 
-const ACTIONS = new Map<IDType, InputAction<any>>();
+const ACTIONS = new Map<IDType, InputAction/*<any>*/>();
 
-export abstract class InputAction<T extends InputType> {
-  static Analog: typeof AnalogAction;
-  static Digital: typeof DigitalAction;
+export abstract class InputAction/*<T extends InputType>*/ {
+  /*public static Analog: typeof AnalogAction;
+  public static Digital: typeof DigitalAction;*/
+
   //readonly inputBindings = new Map<string, InputBinding>();
-  constructor(readonly id: IDType, readonly type: T) {
+  readonly id: IDType;
+  readonly type: T;
+  protected listeners: ((oldValue: number, action: this) => void)[];
+  constructor(id: IDType, type: T) {
+    this.id = id;
+    this.type = type;
     ACTIONS.set(id, this);
   }
 
-  abstract value(): T extends InputType.ANALOG ? number : boolean;
+  abstract value(): number;
 }
 
 export class AnalogAction extends InputAction<InputType.ANALOG> {
@@ -25,10 +31,10 @@ export class AnalogAction extends InputAction<InputType.ANALOG> {
 }
 
 export class DigitalAction extends InputAction<InputType.DIGITAL> {
-  constructor(id: IDType, ) {
+  constructor(id: IDType) {
     super(id, InputType.DIGITAL);
   }
-  value(): boolean {
+  value(): number {
     throw new Error("Method not implemented.");
   }
 }

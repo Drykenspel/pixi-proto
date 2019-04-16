@@ -1,4 +1,4 @@
-type IInput = any;
+import { IInput } from "./iinput";
 
 interface IBindingMatcher {
   match(against: Set<IInput>): IBindingMatch | false;
@@ -8,32 +8,28 @@ interface IBindingMatch {
   modifiers: Iterable<IInput>;
 }
 
-class TriggerMatcher implements IBindingMatcher {
+export class TriggerMatcher implements IBindingMatcher {
   readonly input: IInput;
-  match(against: Set<any>): IBindingMatch | false {
+  match(against: Set<IInput>): IBindingMatch | false {
     throw new Error("Method not implemented.");
   }
 }
 
-class ModifierMatcher implements IBindingMatcher {
-  readonly input: IInput;
-  match(against: Set<IInput>): IBindingMatch | false {
-    return this.input in against ?
-      {
-        modifiers: [...against].filter(i => i !== this.input),
-      }
-      : false;
-  }
-}
-
-class MultiModifierMatcher implements IBindingMatcher {
+export class ModifierMatcher implements IBindingMatcher {
+  readonly inputs: Set<IInput>;
   constructor(inputs: Iterable<IInput>);
-  constructor(readonly inputs: Set<IInput>){};
+  constructor(...inputs: IInput[]) {
+    this.inputs = new Set(inputs);
+  }
   match(against: Set<IInput>): IBindingMatch | false {
-    return [...this.inputs].some(i => !against.has(i)) ?
-      {
-        modifiers: [...against].filter(i => !this.inputs.has(i)),
+    let modifiers = new Set(against);
+    for (var i of this.inputs) {
+      if (!modifiers.has(i)) {
+        return false;
+      } else {
+        modifiers.delete(i);
       }
-      : false;
+    }
+    return { modifiers };
   }
 }
