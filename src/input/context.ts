@@ -77,4 +77,8 @@ export class InputContext extends InputMapContainer {
     });
     return res;
   }
+
+  updateAction(modifiers: Map<string, IInput>, trigger: IInput): void {
+    //TODO
+  }
 }
